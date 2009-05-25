@@ -1,0 +1,148 @@
+Flex Attributes
+===============
+
+Flex Attributes allows you to define an arbitrary amount of data to be stored in 
+a serialized column.  Why?  Because sometimes you have data that just doesn't need
+to be in its own column.  Maybe it's only for display and you never query the DB
+for this data.  Now, you can skip the unnecessary column and just configure your
+model!
+
+Installation
+============
+
+Flex Attributes is available as a rails plugin:
+
+  script/plugin install git://github.com/kylecrum/flex_fields.git
+
+  
+Examples
+========  
+
+To activate, just need to declare flex_attributes in your model.
+
+		class MyModel < ActiveRecord::Base
+		
+			flex_attributes :foo=>String, :bar=>Integer
+			
+		end
+		
+This gives you two new flex attributes: foo and bar
+
+		my_model = MyModel.new(:foo=>'foo',:bar=>1)
+		my_model.foo
+			=> 'foo'
+		my_model.bar
+			=> 1
+			
+Flex Attributes works nicely with inheritance and STI, too, so don't worry about that!
+
+		class AnotherModel < MyModel
+		
+			flex_attributes :more_stuff=>Array
+		
+		end
+		
+		another_model = AnotherModel.new
+		another_model.foo
+			=> nil
+		another_model.more_stuff
+			=> []
+			
+Don't worry about having bad characters in your String stored, either, as the String data
+is Base64 encoded as to not mess up the serialized form in the DB!
+			
+By default, the data is stored in a serialized Hash in a column called 'flex'
+You can change this by passing in column_name.
+
+		class MyModel < ActiveRecord::Base
+		
+			flex_attributes :column_name=>:data, :foo=>String, :bar=>Integer
+		
+		end
+		
+Now, everything is stored in a serialized hash in the data column.
+
+Just like in ActiveRecord, if you want to override the default getter and setter methods,
+you can.  Instead of using write_attribute and read_attribute, use write_flex_attribute and
+read_flex_attribute
+
+		class MyModel < ActiveRecord::Base
+		
+			flex_attributes :foo=>String, :bar=>Integer
+			
+			def foo
+				logger.debug("I am accessing foo")
+				read_flex_attribute(:foo)
+			end
+			
+			def foo=(new_val)
+				logger.debug("I am setting foo to a new value")
+				write_flex_attribute(:foo,new_val)
+			end
+		
+		end
+		
+Conversions
+===========
+
+Flex Attributes will convert the value to the class you specify in the declaration
+
+		class MyModel < ActiveRecord::Base
+		
+			flex_attributes :float_value=>Float, :integer_value=>Integer
+		
+		end
+		
+		model = MyModel.new
+		model.float_value = '1'
+		model.float_value
+			=> 1.0
+		model.integer_value = '1'
+		model.integer_value
+			=> 1
+			
+Currently, Flex Attributes supports these types of fields:
+
+		Array
+		Date
+		DateTime
+		Float
+		Hash
+		Integer
+		String
+		Time
+		
+Dirty Record Tracking
+=====================
+
+This part is a bit experimental, in that it works, but I feel skeptical for hacking up the rails Dirty
+module to get it to work.
+
+To enable dirty tracking, simply include :track_dirty=>true when declaring flex_attributes
+
+		class MyModel < ActiveRecord::Base
+			
+			flex_attributes :track_dirty=>true, :foo=>String
+			
+		end
+		
+Now you have the default Rails dirty methods available to your flex_attributes!
+
+		model = MyModel.new
+		model.changed?
+			=> false	
+		model.foo = 'foo'
+		model.changed?
+			=> true
+		model.foo_changed?
+			=> true
+		model.foo_was
+			=> nil
+		model.foo_change
+			=> ['foo',nil]
+		model.foo = 'bar'
+		model.foo_change
+			=> ['bar',nil]
+		model.changes
+			=> {'foo'=>['bar',nil]}
+		
