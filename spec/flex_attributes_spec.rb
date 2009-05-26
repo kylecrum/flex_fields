@@ -22,6 +22,15 @@ def common_instance_method_specs
     @model.bar.should == 6
   end
   
+  it 'will save values properly' do
+    @model.bar = "6"
+    @model.foo = "foo"
+    @model.save!
+    saved_model = SomeModel.find(@model.id)
+    saved_model.bar.should == 6
+    saved_model.foo.should == "foo"
+  end
+  
 end
 
 describe "FlexAttributes" do

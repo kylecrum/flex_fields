@@ -14,6 +14,7 @@ ActiveRecord::Base.logger.level = Logger::WARN
 ActiveRecord::Schema.define(:version => 0) do
   create_table :some_models do |t|
     t.string :name
+    t.text   :something
   end
 end
  
