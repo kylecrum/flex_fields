@@ -2,13 +2,7 @@ module FlexAttributes
   module Dirty
     
     def self.included(base)
-      base.alias_method_chain :changed,                    :flex_attributes
-      base.alias_method_chain :save,                       :flex_attributes
-      base.alias_method_chain :save!,                      :flex_attributes
-      base.alias_method_chain :reload,                     :flex_attributes
-      base.alias_method_chain :write_flex_attribute,       :dirty
-      base.alias_method_chain :attribute_change,           :flex_attributes
-
+    
       ActiveRecord::Dirty::DIRTY_SUFFIXES.each do |suffix|
         base.flex_attributes_config.keys.each do |flex_attr|
           method_name = "#{flex_attr}#{suffix}"
@@ -18,9 +12,9 @@ module FlexAttributes
       
     end
     
-    def write_flex_attribute_with_dirty (attribute, val)
+    def write_flex_attribute(attribute, val)
       old_val = clone_attribute_value(:read_flex_attribute, attribute)
-      converted_val = write_flex_attribute_without_dirty(attribute,val)
+      converted_val = super(attribute,val)
       mark_flex_attribute_dirty(attribute,converted_val,old_val)
       return converted_val
     end
@@ -42,22 +36,36 @@ module FlexAttributes
       @dirty_flex_attributes ||= {}
     end
     
-    def save_with_flex_attributes(*args)
-      status = save_without_flex_attributes(*args)
+    def save(*args)
+      status = super(*args)
       dirty_flex_attributes.clear if status
       status
     end
     
-    def save_with_flex_attributes!(*args)
-      status = save_without_flex_attributes!(*args)
+    def save!(*args)
+      status = super(*args)
       dirty_flex_attributes.clear
       status
     end
     
-    def reload_with_flex_attributes(*args)
-      record = reload_without_flex_attributes(*args)
+    def reload(*args)
+      record = super(*args)
       dirty_flex_attributes.clear
       record
+    end
+    
+    def attribute_change(attr)
+      if self.class.flex_attributes_config.include?(attr.to_sym)
+        flex_attribute_change(attr)
+      else
+        super(attr)
+      end
+    end
+  
+    def changed
+      changed_without = super
+      changed_without.delete(flex_attribute_column.to_s)
+      changed_without + dirty_flex_attributes.keys
     end
     
     private 
@@ -77,20 +85,6 @@ module FlexAttributes
       
       def flex_attribute_was(attr)
         flex_attribute_changed?(attr) ? dirty_flex_attributes[attr.to_s] : read_flex_attribute(attr.to_sym)
-      end
-    
-      def attribute_change_with_flex_attributes(attr)
-        if self.class.flex_attributes_config.include?(attr.to_sym)
-          flex_attribute_change(attr)
-        else
-          attribute_change_without_flex_attributes(attr)
-        end
-      end
-    
-      def changed_with_flex_attributes
-        changed_without = changed_without_flex_attributes
-        changed_without.delete(flex_attribute_column.to_s)
-        changed_without + dirty_flex_attributes.keys
       end
     
   end
