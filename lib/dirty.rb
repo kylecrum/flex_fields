@@ -25,7 +25,7 @@ module FlexAttributes
       # The attribute already has an unsaved change.
       if dirty_flex_attributes.include?(attribute)
         old_val = dirty_flex_attributes[attribute]
-        dirty_flex_attributes.delete(attribute) unless old_val == new_val 
+        dirty_flex_attributes.delete(attribute) if old_val == new_val 
       else
         dirty_flex_attributes[attribute] = old_val if old_val != new_val
       end
@@ -34,6 +34,18 @@ module FlexAttributes
   
     def dirty_flex_attributes
       @dirty_flex_attributes ||= {}
+    end
+    
+    def changed?
+      super || !dirty_flex_attributes.empty?
+    end
+
+    def changed
+      super | dirty_flex_attributes.keys
+    end
+
+    def changes
+      super.merge(dirty_flex_attributes.keys.inject({}) { |h, attr| h[attr] = flex_attribute_change(attr); h })
     end
     
     def save(*args)
@@ -61,14 +73,14 @@ module FlexAttributes
         super(attr)
       end
     end
-  
-    def changed
-      changed_without = super
-      changed_without.delete(flex_attribute_column.to_s)
-      changed_without + dirty_flex_attributes.keys
-    end
     
-    private 
+    private
+    
+      def changed_attributes
+        changed_attributes_with_flex_column = super
+        changed_attributes_with_flex_column.delete(flex_attribute_column.to_s)
+        changed_attributes_with_flex_column
+      end
     
       def flex_attribute_changed?(attr)
         dirty_flex_attributes.include?(attr.to_s)

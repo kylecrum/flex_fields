@@ -269,8 +269,10 @@ describe "FlexAttributes" do
         end
         
         it 'should handle multiple changes' do
+          @model.save!
+          @model.foo = 'foo2'
           @model.changes.should_not be_empty
-          @model.foo = nil
+          @model.foo = 'foo' 
           @model.changes.should be_empty
         end
         
