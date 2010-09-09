@@ -1,3 +1,10 @@
+require 'dirty'
+
+# Load Converters
+Dir.entries("#{File.dirname(__FILE__)}/converter").each do |filename|
+  require "converter/#{filename.gsub('.rb', '')}" if filename =~ /\.rb$/
+end
+
 module FlexAttributes
   
   def self.included(base)
@@ -120,3 +127,5 @@ module FlexAttributes
     end
   
 end
+
+ActiveRecord::Base.send :include, FlexAttributes

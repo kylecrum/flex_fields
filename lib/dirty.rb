@@ -3,7 +3,7 @@ module FlexAttributes
     
     def self.included(base)
     
-      ActiveRecord::Dirty::DIRTY_SUFFIXES.each do |suffix|
+      ['_changed?', '_change', '_will_change!', '_was'].each do |suffix|
         base.flex_attributes_config.keys.each do |flex_attr|
           method_name = "#{flex_attr}#{suffix}"
           define_method(method_name.to_sym) {send("flex_attribute#{suffix}".to_sym,flex_attr)}

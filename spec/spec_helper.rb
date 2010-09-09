@@ -5,6 +5,8 @@ rescue LoadError
   exit
 end
 
+require 'sqlite3'
+
 ActiveRecord::Base.configurations = {'sqlite3' => {:adapter => 'sqlite3', :database => ':memory:'}}
 ActiveRecord::Base.establish_connection('sqlite3')
  
