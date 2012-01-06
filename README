@@ -22,7 +22,7 @@ To activate, just need to declare flex_attributes in your model.
 
 		class MyModel < ActiveRecord::Base
 		
-			flex_attributes :foo=>String, :bar=>Integer
+			flex_fields :foo=>String, :bar=>Integer
 			
 		end
 		
@@ -38,7 +38,7 @@ Flex Attributes works nicely with inheritance and STI, too, so don't worry about
 
 		class AnotherModel < MyModel
 		
-			flex_attributes :more_stuff=>Array
+			flex_fields :more_stuff=>Array
 		
 		end
 		
@@ -48,15 +48,12 @@ Flex Attributes works nicely with inheritance and STI, too, so don't worry about
 		another_model.more_stuff
 			=> []
 			
-Don't worry about having bad characters in your String stored, either, as the String data
-is Base64 encoded as to not mess up the serialized form in the DB!
-			
 By default, the data is stored in a serialized Hash in a column called 'flex'
 You can change this by passing in column_name.
 
 		class MyModel < ActiveRecord::Base
 		
-			flex_attributes :column_name=>:data, :foo=>String, :bar=>Integer
+			flex_fields :column_name=>:data, :foo=>String, :bar=>Integer
 		
 		end
 		
@@ -68,16 +65,16 @@ read_flex_attribute
 
 		class MyModel < ActiveRecord::Base
 		
-			flex_attributes :foo=>String, :bar=>Integer
+			flex_fields :foo=>String, :bar=>Integer
 			
 			def foo
 				logger.debug("I am accessing foo")
-				read_flex_attribute(:foo)
+				read_flex_field(:foo)
 			end
 			
 			def foo=(new_val)
 				logger.debug("I am setting foo to a new value")
-				write_flex_attribute(:foo,new_val)
+				write_flex_field(:foo,new_val)
 			end
 		
 		end
@@ -111,38 +108,3 @@ Currently, Flex Attributes supports these types of fields:
 		Integer
 		String
 		Time
-		
-Dirty Record Tracking
-=====================
-
-This part is a bit experimental, in that it works, but I feel skeptical for hacking up the rails Dirty
-module to get it to work.
-
-To enable dirty tracking, simply include :track_dirty=>true when declaring flex_attributes
-
-		class MyModel < ActiveRecord::Base
-			
-			flex_attributes :track_dirty=>true, :foo=>String
-			
-		end
-		
-Now you have the default Rails dirty methods available to your flex_attributes!
-
-		model = MyModel.new
-		model.changed?
-			=> false	
-		model.foo = 'foo'
-		model.changed?
-			=> true
-		model.foo_changed?
-			=> true
-		model.foo_was
-			=> nil
-		model.foo_change
-			=> ['foo',nil]
-		model.foo = 'bar'
-		model.foo_change
-			=> ['bar',nil]
-		model.changes
-			=> {'foo'=>['bar',nil]}
-		
