@@ -5,6 +5,19 @@ Flex Fields allows you to define an arbitrary amount of data to be stored in
 a serialized column.  Why?  Because sometimes you have data that just doesn't need
 to be in its own column. 
 
+## Installation ##
+
+You should have a column in your database in order to store the serialized data.  Make the
+column name "flex" for it to work out of the box. 
+
+```
+class AddFlexFieldsColumn < ActiveRecord::Migration
+  def change
+    add_column :some_table, :flex, :text
+  end
+end
+```
+
   
 ## Examples ##
 
