@@ -1,41 +1,36 @@
-Flex Attributes
+Flex Fields
 ===============
 
-Flex Attributes allows you to define an arbitrary amount of data to be stored in 
+Flex Fields allows you to define an arbitrary amount of data to be stored in 
 a serialized column.  Why?  Because sometimes you have data that just doesn't need
-to be in its own column.  Maybe it's only for display and you never query the DB
-for this data.  Now, you can skip the unnecessary column and just configure your
-model!
-
-Installation
-============
-
-Flex Attributes is available as a rails plugin:
-
-  script/plugin install git://github.com/kylecrum/flex_fields.git
+to be in its own column. 
 
   
-Examples
-========  
+## Examples ##
 
-To activate, just need to declare flex_attributes in your model.
+To activate, just need to declare flex_fields in your model.
 
+```
 		class MyModel < ActiveRecord::Base
 		
 			flex_fields :foo=>String, :bar=>Integer
 			
 		end
+```		
 		
-This gives you two new flex attributes: foo and bar
+This gives you two new flex fields: foo and bar
 
+```
 		my_model = MyModel.new(:foo=>'foo',:bar=>1)
 		my_model.foo
 			=> 'foo'
 		my_model.bar
 			=> 1
+```
 			
-Flex Attributes works nicely with inheritance and STI, too, so don't worry about that!
+Flex Fields works nicely with inheritance and STI, too, so don't worry about that!
 
+```
 		class AnotherModel < MyModel
 		
 			flex_fields :more_stuff=>Array
@@ -47,22 +42,26 @@ Flex Attributes works nicely with inheritance and STI, too, so don't worry about
 			=> nil
 		another_model.more_stuff
 			=> []
+```
 			
 By default, the data is stored in a serialized Hash in a column called 'flex'
 You can change this by passing in column_name.
 
+```
 		class MyModel < ActiveRecord::Base
 		
 			flex_fields :column_name=>:data, :foo=>String, :bar=>Integer
 		
 		end
+```
 		
 Now, everything is stored in a serialized hash in the data column.
 
 Just like in ActiveRecord, if you want to override the default getter and setter methods,
-you can.  Instead of using write_attribute and read_attribute, use write_flex_attribute and
-read_flex_attribute
+you can.  Instead of using write_attribute and read_attribute, use write_flex_field and
+read_flex_field
 
+```
 		class MyModel < ActiveRecord::Base
 		
 			flex_fields :foo=>String, :bar=>Integer
@@ -78,15 +77,16 @@ read_flex_attribute
 			end
 		
 		end
-		
-Conversions
-===========
+```
+	
+## Conversions ##
 
 Flex Attributes will convert the value to the class you specify in the declaration
 
+```
 		class MyModel < ActiveRecord::Base
 		
-			flex_attributes :float_value=>Float, :integer_value=>Integer
+			flex_fields :float_value=>Float, :integer_value=>Integer
 		
 		end
 		
@@ -97,8 +97,8 @@ Flex Attributes will convert the value to the class you specify in the declarati
 		model.integer_value = '1'
 		model.integer_value
 			=> 1
-			
-Currently, Flex Attributes supports these types of fields:
+```			
+Currently, Flex Fields supports these types of fields:
 
 		Array
 		Date
