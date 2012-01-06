@@ -8,9 +8,9 @@ Gem::Specification.new do |s|
   s.platform    = Gem::Platform::RUBY
   s.authors     = [ 'Kyle Crum' ]
   s.email       = [ 'kyle.e.crum@gmail.com' ]
-  s.homepage    = 'http://github.com/stouset/twitter_bootstrap_form_for'
-  s.summary     = 'Rails form builder optimized for Twitter Bootstrap'
-  s.description = 'A custom Rails FormBuilder that assumes the use of Twitter Bootstrap'
+  s.homepage    = 'https://github.com/kylecodes/flex_fields' 
+  s.summary     = 'Store an arbitrary amount of data in a serialized column'
+  s.description = 'Easily and flexibly define an arbitrary amount of data to be stored in  a serialized column'
 
   s.files        = `git ls-files`.split("\n")
   s.test_files   = `git ls-files -- {test,spec}/*`.split("\n")
